@@ -119,7 +119,7 @@ __all__ = [
 'vmmap'
 ]
 
-prompt = "pwndbg> "
+prompt = "217gdb> "
 prompt = "\x02" + prompt + "\x01" # STX + prompt + SOH
 prompt = pwndbg.color.red(prompt)
 prompt = pwndbg.color.bold(prompt)
