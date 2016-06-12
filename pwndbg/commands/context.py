@@ -198,23 +198,33 @@ def context_code():
         if closest_line < 0:
             return []
 
-        source = gdb.execute('list %i' % closest_line, from_tty=False, to_string=True)
+        n = int(source_code_length)
 
-        # If it starts on line 1, it's not really using the
-        # correct source code.
-        if not source or closest_line <= 1:
-            return []
+        source_lines = get_current_hightlight_source()
+        # compute the line range
+        start = max(closest_line - 1 - n//2, 0)
+        end = min(closest_line - 1 + n//2 + 1, len(source_lines))
 
-        # highlight the current code line
-        source_lines = source.splitlines()
-        if pwndbg.config.highlight_source:
-            for i in range(len(source_lines)):
-                if source_lines[i].startswith('%s\t' % closest_line):
-                    source_lines[i] = C.highlight(source_lines[i])
-                    break
+        # return the source code listing
+        out = []
+        number_format = '{{:>{}}}'.format(len(str(end)))
+        for number, line in enumerate(source_lines[start:end], start + 1):
+            if pwndbg.config.highlight_source:
+                if int(number) == closest_line:
+                    # the current line has a different style with ANSI
+                    line_format = pwndbg.color.green(number_format) + ' {}'
+                else:
+                    line_format = pwndbg.color.gray(number_format) + ' {}'
+            else:
+                if int(number) == closest_line:
+                    # the current line has a different style without ANSI
+                    line_format = u'→' + number_format + ' {}'
+                else:
+                    line_format = ' ' + number_format + ' {}'
+            out.append(line_format.format(number, line.rstrip('\n')))
 
-        banner = [pwndbg.ui.banner("source")]
-        banner.extend(source_lines)
+        banner = [pwndbg.color.blue(pwndbg.ui.banner("Source (code)"))]
+        banner.extend(out)
         return banner
     except:
         pass
