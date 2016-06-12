@@ -90,8 +90,7 @@ except ImportError:
 import pwndbg.config
 syntax_highlight_style = pwndbg.config.Parameter('syntax-highlight-style', 'monokai', 'Source code / assembly syntax highlight stylename of pygments module')
 def syntax_highlight(source, filename=None, language=None):
-    source = source.rstrip('\n')
-
+    # no syntax hightlight if pygment is not installed
     if not pygments:
         return False, source
 
@@ -105,7 +104,7 @@ def syntax_highlight(source, filename=None, language=None):
 
     try:
         if language:
-            lexer = pygments.lexers.get_lexer_for_name(language)
+            lexer = pygments.lexers.get_lexer_by_name(language)
         elif filename:
             lexer = pygments.lexers.get_lexer_for_filename(filename)
     except pygments.util.ClassNotFound:
@@ -113,7 +112,7 @@ def syntax_highlight(source, filename=None, language=None):
         pass
 
     if lexer:
-        return True, pygments.highlight(source, lexer, formatter)
+        return True, pygments.highlight(source, lexer, formatter).rstrip()
     else:
         return False, source
 
