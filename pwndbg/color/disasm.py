@@ -30,6 +30,8 @@ def branch(x):
 
 def instruction(ins):
     asm = '%-06s %s' % (ins.mnemonic, ins.op_str)
+    # TODO: detect 'arm', 'x86,64' is only for Intel x86/64
+    _highlighted, asm = pwndbg.color.syntax_highlight(asm, language='ARM')
     is_branch = set(ins.groups) & capstone_branch_groups
 
     # Highlight the current line if enabled
