@@ -73,3 +73,47 @@ def terminateWith(x, color):
 
 def ljust_colored(x, length, char=' '):
     return x + (length - len(strip(x))) * char
+
+
+try:
+    import pygments_arm
+except ImportError:
+    pygments_arm = None
+
+try:
+    import pygments.lexers
+    import pygments.formatters
+except ImportError:
+    pygments = None
+
+
+import pwndbg.config
+syntax_highlight_style = pwndbg.config.Parameter('syntax-highlight-style', 'monokai', 'Source code / assembly syntax highlight stylename of pygments module')
+def syntax_highlight(source, filename=None, language=None):
+    source = source.rstrip('\n')
+
+    if not pygments:
+        return False, source
+
+    formatter_class = pygments.formatters.Terminal256Formatter
+    formatter = formatter_class(style=str(syntax_highlight_style))
+
+    lexer = None
+    if language and language == 'ARM':
+        if pygments_arm:
+            lexer = pygments_arm.ArmLexer()
+
+    try:
+        if language:
+            lexer = pygments.lexers.get_lexer_for_name(language)
+        elif filename:
+            lexer = pygments.lexers.get_lexer_for_filename(filename)
+    except pygments.util.ClassNotFound:
+        # no lexer for this file or invalid style
+        pass
+
+    if lexer:
+        return True, pygments.highlight(source, lexer, formatter)
+    else:
+        return False, source
+

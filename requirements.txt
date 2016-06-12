@@ -8,4 +8,6 @@ python-ptrace>=0.8
 ROPgadget
 six
 unicorn>=1.0.0
+pygments
+git+https://github.com/heia-fr/pygments-arm.git
 https://github.com/aquynh/capstone/archive/next.zip#subdirectory=bindings/python
