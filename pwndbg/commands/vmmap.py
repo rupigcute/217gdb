@@ -53,4 +53,4 @@ def vmmap(pages_filter=None):
 
     print(M.legend())
     for page in pages:
-        print(M.get(page.vaddr, text=str(page)))
+        print(M.get(page.vaddr, text=page.color_str()))
